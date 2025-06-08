@@ -1,0 +1,251 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7fb;
+    color: #333;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+    background-repeat: no-repeat;
+    height: 100vh;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #fbfbfb;
+}
+
+/* Loan Container */
+.loan-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* This ensures 3 items per row */
+    gap: 20px;
+    justify-items: center;
+    margin-top: 40px;
+}
+
+.empty-loan{
+    width: 100vw;
+    height: 100vh;
+    text-align: center;
+    font-size: xx-large;
+    position: relative;
+    top: 300px;
+    color: #fff;
+}
+.loan {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 90%;
+    max-width: 300px;
+    transition: transform 0.3s ease;
+}
+
+.loan:hover {
+    transform: translateY(-10px);
+}
+
+.loan h3 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.loan p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 10px 0;
+}
+
+.loan button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.loan button:hover {
+    background-color: #0056b3;
+}
+
+.loan button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Popup Form */
+.popup-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    display: none;
+    z-index: 100;
+}
+
+.popup-form h3 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 1.8rem;
+}
+
+.popup-form label {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    display: block;
+    text-align: left;
+}
+
+.popup-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+}
+
+.popup-form button {
+    background-color: #28a745;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.popup-form button:hover {
+    background-color: #218838;
+}
+
+.popup-form button.close {
+    background-color: #ccc;
+}
+
+.popup-form button.close:hover {
+    background-color: #999;
+}
+
+/* Alert Box */
+.alert-box {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 30px;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 8px;
+    max-width: 80%;
+    width: 400px;
+    display: none;
+    box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.alert-box.success {
+    background-color: #28a745;
+}
+
+.alert-box.error {
+    background-color: #dc3545;
+}
+
+.alert-box.warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.alert-box button {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+.alert-box button:hover {
+    transform: scale(1.2);
+}
+
+/* Alert Fade In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 1024px) {
+    .loan-container {
+        grid-template-columns: repeat(2, 1fr); /* 2 cards per row on tablets */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .loan-container {
+        grid-template-columns: 1fr; /* 1 card per row on smaller screens */
+    }
+
+    .loan {
+        width: 90%;
+        max-width: none;
+    }
+
+    .popup-form {
+        width: 90%;
+    }
+
+    .alert-box {
+        width: 90%;
+    }
+}
+
+#chatbotContainer {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+#chatbotToggle {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}

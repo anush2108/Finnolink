@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Dashboard</title>
+    <link rel="stylesheet" href="./businessPeopleDashboard.css">
+
+</head>
+
+<body>
+    <h1>Business Dashboard</h1>
+    <h2>Post a New Idea</h2>
+    <form id="postIdeaForm">
+        <div>
+            <label for="title">Title:</label>
+            <input type="text" id="title" placeholder="Enter idea title" required>
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <textarea id="description" placeholder="Enter idea description" rows="4" required></textarea>
+        </div>
+        <div>
+            <label for="targetMarket">Target Market:</label>
+            <input type="text" id="targetMarket" placeholder="Enter target market" required>
+        </div>
+        <div>
+            <label for="estimatedBudget">Estimated Budget (₹):</label>
+            <input type="number" id="estimatedBudget" placeholder="Enter estimated budget" required>
+        </div>
+        <div>
+            <label for="category">Category:</label>
+            <select id="category">
+                <option value="Retail and E-commerce">Retail and E-commerce</option>
+                <option value="Food and Beverage">Food and Beverage</option>
+                <option value="Technology and Software">Technology and Software</option>
+                <option value="Healthcare and Wellness">Healthcare and Wellness</option>
+                <option value="Finance and Banking">Finance and Banking</option>
+                <option value="Education and Training">Education and Training</option>
+                <option value="Entertainment and Media">Entertainment and Media</option>
+                <option value="Real Estate and Construction">Real Estate and Construction</option>
+                <option value="Logistics and Transportation">Logistics and Transportation</option>
+                <option value="Fashion and Beauty">Fashion and Beauty</option>
+
+            </select>
+        </div>
+        <button type="submit">Post Idea</button>
+    </form>
+
+    <button type="button" id="viewLoansButton">View Loans</button>
+
+    <h2>Your Posted Ideas</h2>
+    <div id="ideasList" class="idea-container"></div>
+
+    <!-- Chatbot Button and Container -->
+    <div id="chatbotContainer">
+        <a href="http://localhost:8501">
+            <button id="chatbotToggle">
+                💬 Ask your Assistant
+            </button>
+        </a>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getDatabase, ref, push, update, onValue } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDED64RHZH0WAztf5uvyNx3e8dLFJDN-W4",
+            authDomain: "ai-chatbot-4579b.firebaseapp.com",
+            databaseURL: "https://ai-chatbot-4579b-default-rtdb.firebaseio.com/",
+            projectId: "ai-chatbot-4579b",
+            storageBucket: "ai-chatbot-4579b.appspot.com",
+            messagingSenderId: "849839955899",
+            appId: "849839955899:web:61dc2eef17b974de132e9e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const businessEmail = localStorage.getItem("email");
+        if (!businessEmail) {
+            alert("Error: User email not found in local storage. Please log in first.");
+            throw new Error("Email not found.");
+        }
+        const sanitizedEmail = businessEmail.replace(/@/g, "_at_").replace(/\./g, "_dot_");
+        const userIdeasRef = ref(database, `ideas/${sanitizedEmail}`);
+        console.log(userIdeasRef)
+        const ideasListDiv = document.getElementById('ideasList');
+
+        // Posting a new idea
+        const postIdeaForm = document.getElementById('postIdeaForm');
+        postIdeaForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newIdea = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                targetMarket: document.getElementById('targetMarket').value,
+                estimatedBudget: document.getElementById('estimatedBudget').value,
+                category: document.getElementById('category').value,
+                timestamp: Date.now(),
+                status: "Pending",
+                email: businessEmail,
+            };
+            push(userIdeasRef, newIdea).then(() => {
+                alert("Idea posted successfully!");
+                postIdeaForm.reset();
+            }).catch((error) => {
+                console.error("Error posting idea:", error);
+            });
+        });
+
+        // Real-time update for ideas
+        onValue(userIdeasRef, (snapshot) => {
+            ideasListDiv.innerHTML = '';
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                Object.keys(data).forEach((ideaKey) => {
+                    const idea = data[ideaKey];
+                    const ideaDiv = document.createElement('div');
+                    ideaDiv.classList.add('idea');
+                    ideaDiv.innerHTML = `
+    <h3>${idea.title}</h3>
+    <p><strong>Description:</strong> ${idea.description}</p>
+    <p><strong>Target Market:</strong> ${idea.targetMarket}</p>
+    <p><strong>Estimated Budget:</strong> ₹${idea.estimatedBudget}</p>
+    <p><strong>Category:</strong> ${idea.category}</p>
+    <p><strong>Status:</strong> ${idea.status}</p>
+    ${idea.status === "Accepted"
+                            ? `<p><strong>Investor Email:</strong> ${idea.acceptedBy}</p>
+               <p><strong>Accepted On:</strong> ${new Date(idea.acceptedOn).toLocaleString()}</p>
+               <p><strong>Terms & Conditions:</strong> ${idea.termsConditions}</p>
+               <button class="approved-btn" disabled>Approved</button>`
+                            : idea.status === "Under Progress"
+                                ? `<p><strong>Investor Email:</strong> ${idea.acceptedBy}</p>
+               <p><strong>Accepted On:</strong> ${idea.acceptedOn}</p>
+               <p><strong>Terms & Conditions:</strong> ${idea.termsConditions}</p>
+               <button class="accept-btn" data-id="${ideaKey}">Accept</button>
+               <button class="reject-btn" data-id="${ideaKey}">Reject</button>`
+                                : ""
+                        }
+    <button class="queries-btn" data-id="${ideaKey}">Queries</button>
+`;
+
+                    ideasListDiv.appendChild(ideaDiv);
+
+                    const acceptBtn = ideaDiv.querySelector(`.accept-btn[data-id="${ideaKey}"]`);
+                    const rejectBtn = ideaDiv.querySelector(`.reject-btn[data-id="${ideaKey}"]`);
+                    const queriesBtn = ideaDiv.querySelector(`.queries-btn[data-id="${ideaKey}"]`);
+
+                    if (acceptBtn) {
+                        acceptBtn.addEventListener('click', () => {
+                            update(ref(database, `ideas/${sanitizedEmail}/${ideaKey}`), {
+                                status: "Accepted"
+                            }).then(() => alert("Idea accepted successfully!"));
+                        });
+                    }
+
+                    if (rejectBtn) {
+                        rejectBtn.addEventListener('click', () => {
+                            update(ref(database, `ideas/${sanitizedEmail}/${ideaKey}`), {
+                                status: "Pending",
+                                acceptedBy: null,
+                                termsConditions: null,
+                                acceptedOn: null
+                            }).then(() => alert("Idea rejected successfully!"));
+                        });
+                    }
+
+                    if (queriesBtn) {
+                        queriesBtn.addEventListener('click', () => {
+                            window.location.href = `businessqueries.html?ideaKey=${ideaKey}`;
+                        });
+                    }
+                });
+            } else {
+                ideasListDiv.innerHTML = '<p>No ideas found!</p>';
+            }
+        });
+
+        // Redirect to loanforbusiness.html
+        document.getElementById('viewLoansButton').addEventListener('click', () => {
+            window.location.href = "loanforbusiness.html";
+        });
+
+        // Chatbot Toggle Logic
+        // const chatbotToggle = document.getElementById("chatbotToggle");
+        //const chatbotPopup = document.getElementById("chatbotPopup");
+        //const closeChatbot = document.getElementById("closeChatbot");
+
+        //chatbotToggle.addEventListener("click", () => {
+        //    chatbotPopup.style.display = chatbotPopup.style.display === "flex" ? "none" : "flex";
+        //});
+
+        //closeChatbot.addEventListener("click", () => {
+        //    chatbotPopup.style.display = "none";
+        //});
+
+    </script>
+</body>
+
+</html>

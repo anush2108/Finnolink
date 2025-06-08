@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Applicant Dashboard</title>
+    <link rel="stylesheet" href="./loanforbusiness.css">
+</head>
+<body>
+    <h1>Loans Available</h1>
+    
+    <!-- Loans List -->
+    <div id="loansList" class="loan-container loan-empty"></div>
+
+    <!-- Apply Loan Popup Form -->
+    <div id="applyLoanPopup" class="popup-form">
+        <h3>Apply for Loan</h3>
+        <form id="applyLoanForm">
+            <label for="annualIncome">Annual Income:</label>
+            <input type="number" id="annualIncome" name="annualIncome" required>
+            <label for="loanAmount">Loan Amount:</label>
+            <input type="number" id="loanAmount" name="loanAmount" required>
+            <button type="submit">Submit</button>
+            <button type="button" class="close" onclick="closePopup()">Cancel</button>
+        </form>
+    </div>
+
+    <!-- Alert Box -->
+    <div id="alertBox" class="alert-box" style="display: none;">
+        <span id="alertMessage"></span>
+        <button onclick="closeAlert()">X</button>
+    </div>
+
+    <div id="chatbotContainer">
+        <a href="http://localhost:8501">
+            <button id="chatbotToggle">
+                💬 Ask your Assistant
+            </button>
+        </a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getDatabase, ref, onValue, push, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDED64RHZH0WAztf5uvyNx3e8dLFJDN-W4",
+            authDomain: "ai-chatbot-4579b.firebaseapp.com",
+            databaseURL: "https://ai-chatbot-4579b-default-rtdb.firebaseio.com",
+            projectId: "ai-chatbot-4579b",
+            storageBucket: "ai-chatbot-4579b.appspot.com",
+            messagingSenderId: "849839955899",
+            appId: "849839955899:web:61dc2eef17b974de132e9e"
+          };          
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const businessEmail = localStorage.getItem("email");
+        let selectedLoanPath = null;
+
+        // Render loans list from Firebase
+        const renderLoans = (loans) => {
+            const loansListDiv = document.getElementById('loansList');
+            loansListDiv.innerHTML = '';
+
+            Object.keys(loans).forEach((userKey) => {
+                const userLoans = loans[userKey];
+                Object.keys(userLoans).forEach((loanKey) => {
+                    const loan = userLoans[loanKey];
+                    const loanPath = `${userKey}/${loanKey}`;
+                    const loanDiv = document.createElement('div');
+                    loanDiv.classList.add('loan');
+                    loanDiv.innerHTML = `
+                        <h3>${loan.loanType}</h3>
+                        <p><strong>Contact Info:</strong> ${loan.contactInfo}</p>
+                        <p><strong>Eligibility Criteria:</strong> ${loan.eligibilityCriteria}</p>
+                        <p><strong>Loan Amount Range:</strong> ₹${loan.loanAmountRange}</p>
+                        <p><strong>Interest Rate:</strong> ${loan.interestRate}%</p>
+                        <p><strong>Loan Tenure:</strong> ${loan.loanTenure} months</p>
+                        <p><strong>Banker email:</strong> ${loan.email} </p>
+                        <button id="applyBtn-${loanPath}" onclick="applyLoan('${loanPath}')">Apply Loan</button>
+                    `;
+                    loansListDiv.appendChild(loanDiv);
+                    updateApplyButtonStatus(loanPath, loan);
+                });
+            });
+        };
+
+        // Update the apply button status based on loan status
+        const updateApplyButtonStatus = (loanPath, loan) => {
+            const applyBtn = document.getElementById(`applyBtn-${loanPath}`);
+            const applicantsRef = ref(database, `loans/${loanPath}/applicants`);
+            onValue(applicantsRef, (snapshot) => {
+                snapshot.forEach((applicantSnapshot) => {
+                    const applicant = applicantSnapshot.val();
+                    if (applicant.email === businessEmail) {
+                        if (applicant.status === 'approved') {
+                            applyBtn.textContent = 'Approved';
+                            applyBtn.disabled = true;
+                        } else if (applicant.status === 'under_progress') {
+                            applyBtn.textContent = 'Approval in Progress';
+                            applyBtn.disabled = true;
+                        } else {
+                            applyBtn.textContent = 'Apply Loan';
+                        }
+                    }
+                });
+            });
+        };
+
+        // Open the loan application form
+        window.applyLoan = (loanPath) => {
+            selectedLoanPath = loanPath;
+            document.getElementById('applyLoanPopup').style.display = 'block';
+        };
+
+        // Close the loan application form
+        const closePopup = () => {
+            document.getElementById('applyLoanPopup').style.display = 'none';
+            selectedLoanPath = null;
+        };
+
+        // Handle loan application form submission
+        const applyLoanForm = document.getElementById('applyLoanForm');
+        applyLoanForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const annualIncome = document.getElementById('annualIncome').value;
+            const loanAmount = document.getElementById('loanAmount').value;
+
+            if (selectedLoanPath) {
+                const applicantData = {
+                    email: businessEmail,
+                    annualIncome: annualIncome,
+                    loanAmount: loanAmount,
+                    status: 'under_progress' // Mark as under progress when applied
+                };
+                const applicantListRef = ref(database, `loans/${selectedLoanPath}/applicants`);
+                console.log(applicantData)
+                push(applicantListRef, applicantData);
+                showAlert("Loan application submitted successfully!", "success");
+                closePopup();
+                updateApplyButtonStatus(selectedLoanPath); // Update button status
+            }
+        });
+
+        // Firebase listener for the loan data
+        const loansRef = ref(database, 'loans');
+        onValue(loansRef, (snapshot) => {
+            console.log(snapshot.exists())
+            if (snapshot.exists()) {
+                renderLoans(snapshot.val());
+            } else {
+                document.getElementById('loansList').innerHTML = '<p class = "empty-loan">No loans found.</p>';
+            }
+        });
+
+        // Approve loan functionality
+        const approveLoan = (loanPath, applicantKey) => {
+            const applicantRef = ref(database, `loans/${loanPath}/applicants/${applicantKey}`);
+            update(applicantRef, { status: 'approved' });
+            showAlert("Loan approved!", "success");
+            updateApplyButtonStatus(loanPath); // Update button status to 'Approved'
+        };
+        
+        // Reject loan functionality
+        const rejectLoan = (loanPath, applicantKey) => {
+            const applicantRef = ref(database, `loans/${loanPath}/applicants/${applicantKey}`);
+            update(applicantRef, { status: 'rejected' });
+            showAlert("Loan rejected!", "error");
+            updateApplyButtonStatus(loanPath); // Update button status to 'Apply Loan' (rejected)
+        };
+
+        // Show alert function
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            const alertMessage = document.getElementById('alertMessage');
+            alertMessage.textContent = message;
+            alertBox.className = `alert-box ${type}`;
+            alertBox.style.display = 'block';
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 3000); // Hide after 3 seconds
+        }
+
+        // Close alert box manually
+        function closeAlert() {
+            document.getElementById('alertBox').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

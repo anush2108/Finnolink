@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Dashboard</title>
+    <link rel="stylesheet" href="./businessAdvisorDashboard.css">
+</head>
+<body>
+    <h1>Ideas List</h1>
+    <div id="ideasList" class="idea-container"></div>
+
+    <div id="queriesList" class="idea-container" style="display:none;">
+        <h2>Queries for Idea</h2>
+        <button class="back-btn" id="backToIdeasBtn">Back to Ideas</button>
+
+        <div id="queriesContent"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDED64RHZH0WAztf5uvyNx3e8dLFJDN-W4",
+            authDomain: "ai-chatbot-4579b.firebaseapp.com",
+            databaseURL: "https://ai-chatbot-4579b-default-rtdb.firebaseio.com",
+            projectId: "ai-chatbot-4579b",
+            storageBucket: "ai-chatbot-4579b.appspot.com",
+            messagingSenderId: "849839955899",
+            appId: "849839955899:web:61dc2eef17b974de132e9e"
+          };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const ideasListDiv = document.getElementById('ideasList');
+        const queriesListDiv = document.getElementById('queriesList');
+        const queriesContentDiv = document.getElementById('queriesContent');
+        const backToIdeasBtn = document.getElementById('backToIdeasBtn');
+
+        const businessadvisorEmail = localStorage.getItem("email");
+
+        // Event listener for Back to Ideas button
+        backToIdeasBtn.addEventListener('click', () => {
+            queriesListDiv.style.display = 'none';
+            ideasListDiv.style.display = 'block';
+        });
+
+        const renderIdeas = (ideas) => {
+            ideasListDiv.innerHTML = ''; // Clear previous ideas
+
+            Object.keys(ideas).forEach((userKey) => {
+                const userIdeas = ideas[userKey];
+                Object.keys(userIdeas).forEach((ideaKey) => {
+                    const idea = userIdeas[ideaKey];
+                    const ideaDiv = document.createElement('div');
+                    ideaDiv.classList.add('idea');
+                    ideaDiv.innerHTML = `
+                        <h3>${idea.title}</h3>
+                        <p><strong>Description:</strong> ${idea.description}</p>
+                        <p><strong>Target Market:</strong> ${idea.targetMarket}</p>
+                        <p><strong>Estimated Budget:</strong> ₹${idea.estimatedBudget}</p>
+                        <p><strong>Category:</strong> ${idea.category}</p>
+                        <p><strong>Status:</strong> ${idea.status}</p>
+                        <p><strong>Business person email:</strong> ${idea.email}</p>
+                        <button class="view-queries-btn" data-idea-key="${ideaKey}">View Queries</button>
+                    `;
+                    ideasListDiv.appendChild(ideaDiv);
+                });
+            });
+
+            // Add event listeners to "View Queries" buttons
+            const viewQueriesButtons = document.querySelectorAll('.view-queries-btn');
+            viewQueriesButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const ideaKey = e.target.getAttribute('data-idea-key');
+                    fetchQueriesForIdea(ideaKey);
+                });
+            });
+        };
+
+        const fetchQueriesForIdea = (ideaKey) => {
+            const queriesRef = ref(database, `queries/${ideaKey}`);
+            onValue(queriesRef, (snapshot) => {
+                queriesContentDiv.innerHTML = ''; // Clear previous queries
+
+                if (snapshot.exists()) {
+                    const queries = snapshot.val();
+                    Object.keys(queries).forEach((queryKey) => {
+                        const query = queries[queryKey];
+                        const queryDiv = document.createElement('div');
+                        queryDiv.classList.add('query');
+                        queryDiv.innerHTML = `
+                            <p><strong>Query:</strong> ${query.queryText}</p>
+                            <p><strong>Timestamp:</strong> ${new Date(query.timestamp).toLocaleString()}</p>
+                            <div class="answer-section">
+                                <textarea class="answer-input" placeholder="Enter your response"></textarea>
+                                <button class="answer-btn" data-query-key="${queryKey}" data-idea-key="${ideaKey}">Submit Answer</button>
+                                <div class="answers-list" id="answers-${queryKey}"></div>
+                            </div>
+                        `;
+                        queriesContentDiv.appendChild(queryDiv);
+
+                        // Fetch and display previous answers
+                        const answersRef = ref(database, `queries/${ideaKey}/${queryKey}/answers`);
+                        onValue(answersRef, (answerSnapshot) => {
+                            const answersList = document.getElementById(`answers-${queryKey}`);
+                            answersList.innerHTML = ''; // Clear previous answers
+
+                            if (answerSnapshot.exists()) {
+                                const answers = answerSnapshot.val();
+                                Object.keys(answers).forEach((answerKey) => {
+                                    const answer = answers[answerKey];
+                                    const answerDiv = document.createElement('div');
+                                    answerDiv.innerHTML = `<p><strong>Answer:</strong> ${answer.response}</p>`;
+                                    answersList.appendChild(answerDiv);
+                                });
+                            }
+                        });
+
+                        // Add event listener for answer button
+                        const answerButton = queryDiv.querySelector('.answer-btn');
+                        answerButton.addEventListener('click', () => {
+                            const answerText = queryDiv.querySelector('.answer-input').value;
+                            if (answerText.trim()) {
+                                const newAnswerRef = push(ref(database, `queries/${ideaKey}/${queryKey}/answers`));
+                                set(newAnswerRef, {
+                                    response: answerText,
+                                    timestamp: Date.now(),
+                                    answeredBy: "Business Advisor",
+                                    answeredByAdvisor: businessadvisorEmail // Store advisor's email here
+                                });
+                                queryDiv.querySelector('.answer-input').value = ''; // Clear input field after submission
+                            } else {
+                                alert('Answer cannot be empty.');
+                            }
+                        });
+                    });
+                } else {
+                    queriesContentDiv.innerHTML = '<p>No queries found for this idea.</p>';
+                }
+            });
+
+            queriesListDiv.style.display = 'block';
+            ideasListDiv.style.display = 'none';
+        };
+
+        // Fetch and render ideas
+        const ideasRef = ref(database, 'ideas');
+        onValue(ideasRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const ideas = snapshot.val();
+                renderIdeas(ideas);
+            } else {
+                ideasListDiv.innerHTML = '<p>No ideas found</p>';
+            }
+        });
+    </script>
+</body>
+</html>

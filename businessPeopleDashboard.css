@@ -1,0 +1,305 @@
+/* General Reset and Global Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+    color: #fff;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Container for main content */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+/* Header Styling */
+h1, h2 {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+/* Form Styling */
+form {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 40px;
+}
+
+form div {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+    color: #444;
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+textarea {
+    resize: vertical;
+}
+
+button[type="submit"],
+button[type="button"] {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    margin-top: 20px;
+}
+
+button[type="submit"]:hover,
+button[type="button"]:hover {
+    background-color: #45a049;
+}
+
+button[type="button"] {
+    background-color: #007bff;
+}
+
+button[type="button"]:hover {
+    background-color: #0056b3;
+}
+
+
+/*approved button*/
+
+.approved-btn {
+    background-color: #4CAF50; /* Green background for approval */
+    color: white; /* White text color */
+    padding: 10px 20px; /* Comfortable padding */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: not-allowed; /* Indicates that the button is disabled */
+    font-size: 16px; /* Set a reasonable font size */
+    text-align: center; /* Center text inside the button */
+    width: 150px;
+    box-shadow: 0 4px 6px rgba(0, 128, 0, 0.3); /* Soft shadow for effect */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+}
+
+.approved-btn:disabled {
+    background-color: #c34a50; /* Lighter green when disabled */
+    cursor: not-allowed; /* Change cursor to indicate non-interactive state */
+    box-shadow: none; /* Remove shadow when disabled */
+    opacity: 0.7; /* Add opacity for a "disabled" feel */
+}
+
+/* Ideas Section */
+.idea-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.idea {
+    background-color: whitesmoke;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    width: 48%;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: black;
+}
+
+.idea:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+h3 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 10px;
+}
+
+button.accept-btn,
+button.reject-btn,
+button.queries-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+button.accept-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+button.accept-btn:hover {
+    background-color: #218838;
+}
+
+button.reject-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+button.reject-btn:hover {
+    background-color: #c82333;
+}
+
+button.queries-btn {
+    background-color: #ffc107;
+    color: white;
+}
+
+button.queries-btn:hover {
+    background-color: #e0a800;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+    .idea-container {
+        flex-direction: column;
+    }
+
+    .idea {
+        width: 100%;
+    }
+}
+
+/* Alert Styling */
+.alert {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff9800;
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-size: 18px;
+    display: none;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.5s ease;
+    z-index: 999;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+}
+
+.alert.show {
+    display: block;
+    opacity: 1;
+}
+
+.alert.success {
+    background-color: #4CAF50;
+}
+
+.alert.error {
+    background-color: #f44336;
+}
+
+.alert-info {
+    background-color: #2196F3;
+}
+
+/* Adding some spacing and making elements look attractive */
+input, textarea, select {
+    margin-top: 8px;
+}
+
+button[type="submit"], button[type="button"] {
+    padding: 12px 25px;
+    border-radius: 5px;
+}
+
+/* Making header and section text more prominent */
+h1 {
+    font-size: 3rem;
+    color: #fff;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 2rem;
+    color: #fff;
+}
+
+/* Form input border styles for better focus visibility */
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #aaa;
+}
+
+/* Ensure that no functions are broken and layout works across screen sizes */
+@media (max-width: 768px) {
+    form {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+    }
+}
+
+/* CHAT BOT INTEGRATE UI */
+#chatbotContainer {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+#chatbotToggle {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+

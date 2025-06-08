@@ -1,0 +1,130 @@
+<!-- businessqueries.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Business Queries</title>
+  <link rel="stylesheet" href="./businessqueries.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Business Queries</h1>
+      <h2>Submit Your Query</h2>
+    </header>
+
+    <form id="queryForm">
+      <div class="form-group">
+        <label for="queryText">Your Query:</label>
+        <textarea id="queryText" placeholder="Enter your query" rows="4" required></textarea>
+      </div>
+      <button type="submit">Submit Query</button>
+    </form>
+
+    <section>
+      <h2>All Queries</h2>
+      <div id="queriesList" class="queries-container"></div>
+    </section>
+
+    <div id="answersList" class="answers-container"></div>
+  </div>
+
+  <div id="chatbotContainer">
+    <a href="http://localhost:8501">
+        <button id="chatbotToggle">
+            💬 Ask your Assistant
+        </button>
+    </a>
+    </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { app, auth } from "./firebase-config.js";
+  
+    const database = getDatabase(app);
+    const urlParams = new URLSearchParams(window.location.search);
+    const ideaKey = urlParams.get('ideaKey');
+    const queriesRef = ref(database, `queries/${ideaKey}`);
+    const queriesListDiv = document.getElementById('queriesList');
+  
+    // Real-time listener for queries
+    onChildAdded(queriesRef, (snapshot) => {
+      const queryData = snapshot.val();
+      const queryKey = snapshot.key;
+
+      if (!queryData || !queryKey) return;
+  
+      const queryDiv = document.createElement('div');
+      queryDiv.classList.add('query');
+      queryDiv.innerHTML = `
+        <p><strong>Query:</strong> ${queryData.queryText}</p>
+        <p><strong>Submitted On:</strong> ${new Date(queryData.timestamp).toLocaleString()}</p>
+        <div class="answer-section" id="answer-section-${queryKey}">
+          <h3>Answers:</h3>
+          <div id="answersFor-${queryKey}"></div>
+        </div>
+      `;
+      queriesListDiv.appendChild(queryDiv);
+  
+      // Set up real-time listener for answers to this query
+      const answersRef = ref(database, `queries/${ideaKey}/${queryKey}`);
+
+    onChildAdded(answersRef, (answerSnapshot) => {
+    const answerData = answerSnapshot.val();
+
+    // ✅ Only proceed if it's a valid answer object
+    if (!answerData || !answerData.response || !answerData.answeredByAdvisor || !answerData.timestamp) return;
+
+    const answerDiv = document.createElement('div');
+    answerDiv.classList.add('answer');
+
+    answerDiv.innerHTML = `
+        <p><strong>Response:</strong> ${answerData.response}</p>
+        <p><strong>Business Advisor:</strong> ${answerData.answeredByAdvisor}</p>
+        <p><strong>Answered On:</strong> ${new Date(answerData.timestamp).toLocaleString()}</p>
+    `;
+
+    const answersContainer = document.getElementById(`answersFor-${queryKey}`);
+    if (answersContainer) {
+        answersContainer.appendChild(answerDiv);
+    }
+    });
+        
+    });
+
+    console.log(document.referrer)
+  
+    // Handle query submission
+    const queryForm = document.getElementById('queryForm');
+    queryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const queryText = document.getElementById('queryText').value;
+  
+      const newQuery = {
+        queryText,
+        timestamp: Date.now(),
+      };
+  
+      push(queriesRef, newQuery).then(() => {
+        showAlert("Query submitted successfully!", "success");
+        queryForm.reset();
+      }).catch((error) => {
+        console.error("Error submitting query:", error);
+        showAlert("Error submitting query. Please try again!", "error");
+      });
+    });
+  
+    // Alert utility
+    function showAlert(message, type) {
+      const alert = document.createElement('div');
+      alert.classList.add('alert', type);
+      alert.textContent = message;
+      document.body.appendChild(alert);
+      setTimeout(() => alert.remove(), 3000);
+    }
+  </script>
+  
+</body>
+</html>

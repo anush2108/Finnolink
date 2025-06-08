@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banker Dashboard</title>
+  <link rel="stylesheet" href="./bankerDashboard.css">
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+    import { getDatabase, ref, push, update, onValue } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDED64RHZH0WAztf5uvyNx3e8dLFJDN-W4",
+      authDomain: "ai-chatbot-4579b.firebaseapp.com",
+      databaseURL: "https://ai-chatbot-4579b-default-rtdb.firebaseio.com",
+      projectId: "ai-chatbot-4579b",
+      storageBucket: "ai-chatbot-4579b.appspot.com",
+      messagingSenderId: "849839955899",
+      appId: "849839955899:web:61dc2eef17b974de132e9e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    function sanitizeEmail(email) {
+      return email.replace(/@/g, '_at_').replace(/\./g, '_dot_');
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const loanForm = document.getElementById("loanForm");
+      const loanList = document.getElementById("loanList");
+      const email = localStorage.getItem('email');
+
+      if (!email) {
+        alert("Email not found in localStorage. Please log in.");
+        return;
+      }
+
+      const sanitizedEmail = sanitizeEmail(email);
+
+      loanForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const loanData = {
+          loanType: document.getElementById("loanType").value,
+          interestRate: parseFloat(document.getElementById("interestRate").value),
+          loanTenure: parseInt(document.getElementById("loanTenure").value),
+          loanAmountRange: document.getElementById("loanAmountRange").value.trim(),
+          eligibilityCriteria: document.getElementById("eligibilityCriteria").value.trim(),
+          contactInfo: document.getElementById("contactInfo").value.trim(),
+          email: email
+        };
+
+        try {
+          console.log(loanData)
+          await push(ref(db, `loans/${sanitizedEmail}`), loanData);
+          loanForm.reset();
+          showAlert("Loan details added successfully!", "success");
+        } catch (error) {
+          console.error("Error adding loan details:", error);
+          showAlert("Failed to add loan details. Try again.", "error");
+        }
+      });
+
+      function renderLoanItem(key, loan) {
+        const loanItem = document.createElement("div");
+        loanItem.style.border = "1px solid #ccc";
+        loanItem.style.margin = "10px 0";
+        loanItem.style.padding = "10px";
+
+        loanItem.innerHTML = `
+          <p><strong>Loan Type:</strong> ${loan.loanType}</p>
+          <p><strong>Interest Rate:</strong> ${loan.interestRate}%</p>
+          <p><strong>Loan Tenure:</strong> ${loan.loanTenure} months</p>
+          <p><strong>Amount Range:</strong> ${loan.loanAmountRange}</p>
+          <p><strong>Eligibility:</strong> ${loan.eligibilityCriteria}</p>
+          <p><strong>Contact:</strong> ${loan.contactInfo}</p>
+          <p><strong>Banker Email:</strong> ${loan.email}</p>
+
+          <div id="applicants-${key}">
+            <h4>Applicants:</h4>
+            <table border="1" style="width: 100%; text-align: left;">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Loan Amount</th>
+                  <th>Annual Income</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        `;
+
+        loanList.appendChild(loanItem);
+        loadApplicants(key);
+      }
+
+      function loadLoans() {
+        onValue(ref(db, `loans/${sanitizedEmail}`), (snapshot) => {
+          loanList.innerHTML = "<h2>Posted Loans</h2>";
+          snapshot.forEach((childSnapshot) => {
+            const key = childSnapshot.key;
+            const loan = childSnapshot.val();
+            console.log(key)
+            renderLoanItem(key, loan);
+          });
+        });
+      }
+
+      function loadApplicants(loanKey) {
+        const applicantsRef = ref(db, `loans/${sanitizedEmail}/${loanKey}/applicants`);
+        onValue(applicantsRef, (snapshot) => {
+          const applicantsTable = document.querySelector(`#applicants-${loanKey} tbody`);
+          applicantsTable.innerHTML = ""; // Clear existing rows
+
+          snapshot.forEach((childSnapshot) => {
+            const applicant = childSnapshot.val();
+
+            if (applicant.status === "approved" || applicant.status === "rejected") return;
+
+            const row = document.createElement("tr");
+            row.id = `applicant-${loanKey}-${childSnapshot.key}`;
+            row.innerHTML = `
+              <td>${applicant.email}</td>
+              <td>${applicant.loanAmount}</td>
+              <td>${applicant.annualIncome}</td>
+              <td>${applicant.status || "under_progress"}</td>
+              <td>
+                <button onclick="reactToApplicant('${loanKey}', '${childSnapshot.key}', 'approved')">Accept</button>
+                <button onclick="reactToApplicant('${loanKey}', '${childSnapshot.key}', 'rejected')">Reject</button>
+              </td>
+            `;
+            applicantsTable.appendChild(row);
+          });
+        });
+      }
+
+      window.reactToApplicant = async (loanKey, applicantKey, status) => {
+        const applicantRef = ref(db, `loans/${sanitizedEmail}/${loanKey}/applicants/${applicantKey}`);
+        try {
+          await update(applicantRef, { status });
+          removeApplicantRow(loanKey, applicantKey);
+        } catch (error) {
+          console.error("Error updating applicant status:", error);
+          alert("Failed to update status. Try again.");
+        }
+      };
+
+      function removeApplicantRow(loanKey, applicantKey) {
+        const row = document.getElementById(`applicant-${loanKey}-${applicantKey}`);
+        if (row) row.remove();
+      }
+
+      function showAlert(message, type = 'error') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert ${type} show`;
+        alertDiv.innerText = message;
+
+        document.body.appendChild(alertDiv);
+
+        setTimeout(() => {
+          alertDiv.classList.remove('show');
+          alertDiv.remove();
+        }, 3000);
+      }
+
+      loadLoans();
+    });
+  </script>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 20px;">
+  <h1>Banker Dashboard</h1>
+  <h2>Post Loan Details</h2>
+  <form id="loanForm">
+    <label>Loan Type: <input type="text" id="loanType" required></label><br>
+    <label>Interest Rate (%): <input type="number" id="interestRate" step="0.01" required></label><br>
+    <label>Loan Tenure (months): <input type="number" id="loanTenure" required></label><br>
+    <label>Loan Amount Range: <input type="text" id="loanAmountRange" required></label><br>
+    <label>Eligibility Criteria: <input type="text" id="eligibilityCriteria" required></label><br>
+    <label>Contact Info: <input type="text" id="contactInfo" required></label><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="loanList"></div>
+  <div id="chatbotContainer">
+    <a href="http://localhost:8501">
+        <button id="chatbotToggle">
+            💬 Ask your Assistant
+        </button>
+    </a>
+</div>
+</body>
+</html>

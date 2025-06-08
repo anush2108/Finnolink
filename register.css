@@ -1,0 +1,138 @@
+/* General Body Styling */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Jost', sans-serif;
+    background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+  }
+  
+  /* Box Container */
+  .box {
+    width: 400px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 5px 20px 50px #000;
+    overflow: hidden;
+  }
+  
+  /* Form Styling */
+  .form {
+    padding: 30px;
+    text-align: center;
+  }
+  
+  .form h2 {
+    color: #573b8a;
+    margin-bottom: 20px;
+    font-size: 2em;
+    font-weight: bold;
+  }
+  
+  /* Input Box Styling */
+  .inputbox {
+    position: relative;
+    margin: 20px 0;
+  }
+  
+  .inputbox input, .inputbox select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .inputbox span {
+    position: absolute;
+    top: -20px;
+    left: 10px;
+    font-size: 14px;
+    color: #888;
+  }
+  
+  .inputbox input:focus {
+    border-color: #573b8a;
+  }
+  
+  /* Select Box Styling */
+  .selectbox {
+    text-align: left;
+    margin: 20px 0;
+  }
+  
+  .selectbox label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #888;
+  }
+  
+  .selectbox select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .selectbox select:focus {
+    border-color: #573b8a;
+  }
+  
+  /* Submit Button Styling */
+  .sub {
+    width: 100%;
+    padding: 10px;
+    background: #573b8a;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .sub:hover {
+    background: #6d44b8;
+  }
+  
+  /* Text and Link Styling */
+  p {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #666;
+  }
+  
+  p a {
+    color: #573b8a;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+  
+  p a:hover {
+    color: #6d44b8;
+  }
+  
+  /* Error Message Styling */
+  .error-message {
+    color: red;
+    font-size: 0.85em;
+    text-align: left;
+    margin: 5px 0;
+  }
+  
+  .error-border {
+    border: 2px solid red;
+  }
+  

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finnolink</title>
+  <link rel="stylesheet" href="./index.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap">
+</head>
+  
+
+<body>
+  <!-- Navbar -->
+<header class="navbar">
+  <div class="navbar-left">
+    <span class="subtitle">Finnolink</span>
+  </div>
+  <div class="navbar-right">
+    <h1 class="title">Bridge Between Investors and Business People</h1>
+  </div>
+  
+</header>
+<div class='container'>
+<div class='image-section'>
+<img src="images/bbb.png" alt="Thumbnail Image" width="2500" height="500">
+</div>
+
+  
+  <style>
+    body {
+      background-color: #0c0824;
+      font-family: Arial, sans-serif;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    .section {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .section h2 {
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .section h2 .highlight {
+      color: #a66cfd;
+    }
+
+    .section p {
+      color: #ccc;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background-color: #1b133a;
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 260px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .card h3 {
+      font-size: 18px;
+      margin: 15px 0 5px;
+    }
+
+    .card p {
+      color: #ccc;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <section class="section">
+    <h2>The Features <span class="highlight">Are!!</span></h2>
+    <p>Industry-specific talks on the main stage.</p>
+
+    <div class="cards">
+      <div class="card">
+        <img src="images/111.jpg" alt="Digital Solutions">
+        <h3><strong>Business People</strong></h3>
+        <p> Where Business Meets Capital</p>
+      </div>
+      <div class="card">
+        <img src="images/1.jpg" alt="People Power">
+        <h3><strong>Investors</strong></h3>
+        <p>Invest with insight. Grow with confidence.</p>
+      </div>
+      <div class="card">
+        <img src="images/3.jpg" alt="Biz of Tomorrow">
+        <h3><strong>Financial Experts</strong></h3>
+        <p> Drive decisions. Shape financial success.</p>
+      </div>
+    </div>
+  </section>
+
+</body>
+
+  <h2>Your idea meets its investor, <span class="highlight">log in now!</span></h2>
+  <div class="box">
+    <div class="form" id="loginForm">
+      <h2>Login</h2>
+      <div class="inputbox">
+        <input type="text" id="loginUsername" placeholder="Enter Email" required>
+        <span>Email</span>
+        <div id="emailError" class="error-message"></div>
+      </div>
+      <div class="inputbox">
+        <input type="password" id="loginPassword" placeholder="Enter Password" required>
+        <span>Password</span>
+        <div id="passwordError" class="error-message"></div>
+      </div>
+      <div class="inputbox">
+        <select id="loginUserType" required>
+          <option value="" disabled selected>Select Role</option>
+          <!-- <option value="User">User</option> -->
+          <option value="Business People">Business People</option>
+          <option value="Investors">Investors</option>
+          <option value="Banker">Banker</option>
+          <!-- <option value="Business Advisor">Business Advisor</option> -->
+        </select>
+      </div>
+      <button class="sub" id="login">Login</button>
+      <p><a href="#" id="forgotPasswordLink">Forgot Password?</a></p>
+      <p>Don't have an account? <a href="./register.html">Register</a></p>
+    </div>
+
+
+    <div class="forgot-password" id="forgotPassword">
+      <h2>Reset Password</h2>
+      <div class="inputbox">
+        <input type="email" id="resetEmail" placeholder="Enter your email" required>
+        <span>Email</span>
+      </div>
+      <button class="sub" id="resetPasswordButton">Submit</button>
+      <p><a href="#" id="backToLoginLink">Back to Login</a></p>
+    </div>
+  </div>
+
+  <!-- <div id="chatbotContainer">
+      <a href="http://localhost:8501">
+          <button id="chatbotToggle">
+              💬 Ask your Assistant
+          </button>
+      </a>
+  </div> -->
+  
+  <script type="module" src="chatbot.js"></script>
+
+  <script type="module">
+    import { app,auth, db } from "./firebase-config.js";
+    import { signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
+    import { ref, get } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+  
+    document.getElementById("login").addEventListener("click", function (e) {
+      e.preventDefault();
+  
+      const email = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+      const selectedRole = document.getElementById("loginUserType").value;
+  
+      const emailError = document.getElementById("emailError");
+      const passwordError = document.getElementById("passwordError");
+      const emailField = document.getElementById("loginUsername");
+      const passwordField = document.getElementById("loginPassword");
+  
+      // Reset error messages and styles
+      emailError.textContent = "";
+      passwordError.textContent = "";
+      emailField.classList.remove("error-border");
+      passwordField.classList.remove("error-border");
+  
+      // Basic form validation
+      if (!email) {
+        emailError.textContent = "Please enter your email.";
+        emailField.classList.add("error-border");
+        return;
+      }
+  
+      if (!password) {
+        passwordError.textContent = "Please enter your password.";
+        passwordField.classList.add("error-border");
+        return;
+      }
+  
+      if (!selectedRole) {
+        alert("Please select your role.");
+        return;
+      }
+  
+      const emailKey = email.replace(/\./g, ","); // Replace `.` with `,` for a valid key
+  
+      // Firebase Authentication
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+  
+          // Fetch user data from Firebase Realtime Database
+          const userRef = ref(db, 'users/' + emailKey);
+          get(userRef)
+            .then((snapshot) => {
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+  
+                // Validate user role
+                if (userData.userType === selectedRole) {
+                  // Store user details in localStorage
+                  localStorage.setItem('email', email);
+                  localStorage.setItem('role', userData.userType);
+  
+                  console.log("User email saved in localStorage:", email); // Log the saved email
+                  console.log("User role saved in localStorage:", userData.userType); // Log the saved role
+  
+                  alert("Login successful! Email: " + email + " Role: " + userData.userType);
+  
+                  // Redirect to the corresponding dashboard
+                  switch (userData.userType) {
+                    case "User":
+                      window.location.href = "./userDashboard.html";
+                      break;
+                    case "Business People":
+                      window.location.href = "./businessPeopleDashboard.html";
+                      break;
+                    case "Investors":
+                      window.location.href = "./investorsDashboard.html";
+                      break;
+                    case "Banker":
+                      window.location.href = "./bankerDashboard.html";
+                      break;
+                    case "Business Advisor":
+                      window.location.href = "./businessAdvisorDashboard.html";
+                      break;
+                    default:
+                      alert("Unknown user type!");
+                  }
+                } else {
+                  alert("Role mismatch! Please select the correct role for your account.");
+                }
+              } else {
+                alert("No user data found in the database!");
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching user data:", error);
+              alert("Error validating role.");
+            });
+        })
+        .catch((error) => {
+          console.error("Login error:", error);
+          passwordError.textContent = "Invalid email or password.";
+          passwordField.classList.add("error-border");
+        });
+    });
+  
+    // Show forgot password section
+    document.getElementById("forgotPasswordLink").addEventListener("click", function (e) {
+      e.preventDefault();
+      document.getElementById("forgotPassword").style.display = "block";
+      document.getElementById("loginForm").style.display = "none";
+    });
+  
+    // Back to login
+    document.getElementById("backToLoginLink").addEventListener("click", function (e) {
+      e.preventDefault();
+      document.getElementById("forgotPassword").style.display = "none";
+      document.getElementById("loginForm").style.display = "block";
+    });
+  
+    // Reset password
+    document.getElementById("resetPasswordButton").addEventListener("click", function (e) {
+      const email = document.getElementById("resetEmail").value.trim();
+  
+      if (!email) {
+        alert("Please enter your email address.");
+        return;
+      }
+  
+      sendPasswordResetEmail(auth, email)
+        .then(() => {
+          alert("We have sent you an email to reset your password. Please check your inbox...!");
+          document.getElementById("forgotPassword").style.display = "none";
+          document.getElementById("loginForm").style.display = "block";
+        })
+        .catch((error) => {
+          console.error("Error resetting password:", error);
+          alert("There was an error resetting your password. Please try again.");
+        });
+    });
+  </script>
+  
+</body>
+</html>
+

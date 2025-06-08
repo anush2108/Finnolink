@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bridge Between Investor And Business People</title>
+  <link rel="stylesheet" href="./register.css">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap">
+</head>
+<body>
+  <div class="box">
+    <div class="form">
+      <h2>Registration Form</h2>
+      <form id="registrationForm">
+        <!-- Username -->
+        <div class="inputbox">
+          <input type="text" id="username" placeholder="Username"required>
+          <span>Username</span>
+        </div>
+        
+        <!-- Email -->
+        <div class="inputbox">
+          <input type="email" id="email" placeholder="Email"required>
+          <span>Email</span>
+        </div>
+        
+        <!-- Phone -->
+        <div class="inputbox">
+          <input type="text" id="phone" placeholder="Phone Nuumber"required>
+          <span>Phone Number</span>
+        </div>
+        
+        <!-- Password -->
+        <div class="inputbox">
+          <input type="password" id="password" placeholder="Password"required>
+          <span>Password</span>
+        </div>
+        
+        <!-- Confirm Password -->
+        <div class="inputbox">
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+          <span>Confirm Password</span>
+          <div id="passwordError" class="error-message"></div>
+        </div>
+        
+        <!-- User Type -->
+        <div class="selectbox">
+          <label for="userType">Select User Type:</label>
+          <select id="userType" required>
+            <option value="" disabled selected>Select User Type</option>
+            
+            <option value="Business People">Business People</option>
+            <option value="Investors">Investors</option>
+            <option value="Banker">Banker</option>
+            
+          </select>
+        </div>
+        
+        <!-- Submit Button -->
+        <input type="submit" value="Register" class="sub" id="register">
+      </form>
+      <p>Already have an account? <a href="index.html">Login</a></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+    import { app,auth, db } from "./firebase-config.js";
+
+
+    // Handle Registration
+    document.getElementById("registrationForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const userType = document.getElementById("userType").value;
+
+      // Validate Form Inputs
+      if (!username || !email || !phone || !password || !userType) {
+        alert("All fields are required!");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      const emailKey = email.replace(/\./g, ","); // Replace `.` with `,` for a valid Firebase key
+
+      try {
+        // Register User in Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Save Additional Data in Firebase Database
+        await set(ref(db, 'users/' + emailKey), {
+          username,
+          email,
+          phone,
+          userType
+        });
+
+        alert("Registration Successful!");
+        window.location.href = "index.html"; // Redirect to Login Page
+      } catch (error) {
+        console.error("Error during registration:", error);
+        alert(error.message || "Registration failed. Please try again.");
+      }
+    });
+  </script>
+</body>
+</html>

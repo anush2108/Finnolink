@@ -1,0 +1,181 @@
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+    color: #333;
+}
+
+h1, h2 {
+    text-align: center;
+    color: white;
+    font-weight: 700;
+    margin: 20px 0;
+}
+
+h3 {
+    margin: 10px 0;
+    color: #343a40;
+}
+
+/* Container for Ideas and Queries */
+.idea-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.idea, .query {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-bottom: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.idea:hover, .query:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.idea h3, .query p {
+    margin: 10px 0;
+}
+
+button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+/* Button Styles */
+.view-queries-btn {
+    background-color: #0056b3;
+    color: #fff;
+}
+
+.view-queries-btn:hover {
+    background-color: #09bbf6;
+}
+
+.answer-btn, #submitTnC {
+    background-color: #28a745;
+    color: white;
+}
+
+.answer-btn:hover, #submitTnC:hover {
+    background-color: #218838;
+}
+
+.back-btn {
+    background-color: #007bff;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.back-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Popup Styling */
+.popup {
+    border-radius: 8px;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Alert Styling */
+.alert {
+    padding: 15px 20px;
+    background: linear-gradient(to right, #007bff, #0056b3);
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    text-align: center;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Overlay for Popup */
+.overlay.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay {
+    display: none;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* Answer Section Styling */
+.answer-section {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    margin-right: 80px;
+    gap: 10px;
+}
+
+.answer-input {
+    font-size: 1rem;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.answer-btn {
+    align-self: flex-end;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .idea-container {
+        grid-template-columns: 1fr;
+    }
+
+    .popup {
+        width: 95%;
+        padding: 10px;
+    }
+}
+

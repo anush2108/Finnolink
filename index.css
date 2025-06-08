@@ -1,0 +1,177 @@
+/* Navbar styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  padding: 5px 7px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 500;
+}
+
+.navbar-left .subtitle {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color:  #4b0082;
+  font-family: 'Jost', sans-serif;
+   margin-left: 20px;
+}
+
+.navbar-right .title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c3e50;
+  font-family: 'Jost', sans-serif;
+   margin-right: 20px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  min-height: 100vh;
+  padding: 100px;
+}
+.image-section .banner-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 20px;
+  margin-bottom: 100px;
+}
+/* Add padding-top to body content so it doesn't hide behind fixed navbar */
+body {
+  padding-top: 40px;
+}
+
+
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Jost', sans-serif;
+  background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+}
+
+.box {
+  width: 400px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 5px 20px 50px #000;
+  overflow: hidden;
+}
+
+.form {
+  padding: 30px;
+  text-align: center;
+}
+
+.form h2 {
+  color: #573b8a;
+  margin-bottom: 20px;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.inputbox {
+  position: relative;
+  margin: 20px 0;
+}
+
+.inputbox input, .inputbox select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.inputbox span {
+  position: absolute;
+  top: -20px;
+  left: 10px;
+  font-size: 14px;
+  color: #888;
+}
+
+.inputbox input:focus {
+  border-color: #573b8a;
+}
+
+.sub {
+  width: 100%;
+  padding: 10px;
+  background: #573b8a;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.sub:hover {
+  background: #6d44b8;
+}
+
+p {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+p a {
+  color: #573b8a;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+p a:hover {
+  color: #6d44b8;
+}
+
+.forgot-password {
+  display: none;
+  padding: 20px;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.85em;
+  text-align: left;
+  margin: 5px 0;
+}
+
+.error-border {
+  border: 2px solid red;
+}
+
+#chatbotContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+#chatbotToggle {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
