@@ -50,6 +50,16 @@ We integrated the **Ollama LLM** to handle:
 ---
 
 ## 📸 Screenshots
+Landing Page:
+![Screenshot 2025-05-31 134602](https://github.com/user-attachments/assets/97228aba-3492-4b00-9f1c-bdec1912b99c)
+Login Page:
+![Screenshot 2025-05-31 134623](https://github.com/user-attachments/assets/877e5fa7-53da-4a1f-9451-1ee28cd1f4d0)
+Business Dashboard:
+![screenshot_2025-04-11_at_8 32 39___pm (2)](https://github.com/user-attachments/assets/398b0ff8-3e37-4306-bd69-5738dbbdc259)
+AI Chatbot:
+![Screenshot 2025-04-11 at 8 33 04 PM](https://github.com/user-attachments/assets/439af22e-d0f8-4f9e-907d-075b89e3ce0e)
+
+
 
 ## 🧪 Future Enhancements
 
